@@ -2,10 +2,11 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:fa="http://schemas.fontawesome.io/icons/"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450" d:DesignWidth="800" IsEnabled="{Binding IsEnabled,Mode=OneWay}">
     <Grid>
+        <Grid>
         <StackPanel Margin="20">
             <TextBlock Text="First Name"/>
             <TextBox Text="{Binding FirstName, UpdateSourceTrigger=PropertyChanged}" />
@@ -20,8 +21,9 @@
             <DatePicker SelectedDate="{Binding DateOfBirth,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
             <Button Content="Proceed" 
-        Command="{Binding ProceedCommand}" 
-        IsEnabled="{Binding IsEnabled}" />
+        Command="{Binding ProceedCommand}" />
         </StackPanel>
+    </Grid>
+        <fa:ImageAwesome Icon="Refresh" Spin="True" Height="50" Width="50" Visibility="{Binding LoaderVisibility,Mode=OneWay}"></fa:ImageAwesome>
     </Grid>
 </UserControl>

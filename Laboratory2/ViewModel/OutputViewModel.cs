@@ -16,7 +16,6 @@ namespace Laboratory2.ViewModel
         {
             _person = person ?? throw new ArgumentNullException(nameof(person));
             _gotoFormView = gotoFormView ?? throw new ArgumentNullException(nameof(gotoFormView));
-
         }
 
         public Person Person => _person;
@@ -28,7 +27,6 @@ namespace Laboratory2.ViewModel
         public ZodiacSigns SunSign => _person.WesternSign;
         public ChineseZodiacSigns ChineseSign => _person.ChineseSign;
         public bool IsBirthday => _person.IsBirthday;
-
         public RelayCommand ReturnCommand => _returnCommand ??= new RelayCommand(_gotoFormView);
     }
 }

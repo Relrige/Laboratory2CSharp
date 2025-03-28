@@ -8,7 +8,7 @@ using System.Windows;
 public class FormViewModel : INotifyPropertyChanged
 {
 
-    #region Fields_ Properties_Constructor
+    #region Fields_Properties_Constructor
     private readonly Action<Person> _gotoResultView;
 
     public FormViewModel(Action<Person> gotoResultView)
@@ -21,35 +21,33 @@ public class FormViewModel : INotifyPropertyChanged
     private string _email;
     private DateTime _dateOfBirth = DateTime.Today;
 
+    private bool _isEnabled = true;
+    private Visibility _loaderVisibility = Visibility.Hidden;
+
     public string FirstName
     {
         get => _firstName;
         set
         {
             _firstName = value;
-            OnPropertyChanged();
             ProceedCommand.NotifyCanExecuteChanged();
         }
     }
-
     public string LastName
     {
         get => _lastName;
         set
         {
             _lastName = value;
-            OnPropertyChanged();
             ProceedCommand.NotifyCanExecuteChanged();
         }
     }
-
     public string Email
     {
         get => _email;
         set
         {
             _email = value;
-            OnPropertyChanged();
             ProceedCommand.NotifyCanExecuteChanged();
         }
     }
@@ -59,27 +57,62 @@ public class FormViewModel : INotifyPropertyChanged
         set
         {
             _dateOfBirth = value;
-            OnPropertyChanged();
             ProceedCommand.NotifyCanExecuteChanged();
+        }
+    }
+
+    public bool IsEnabled
+    {
+        get => _isEnabled;
+        set
+        {
+            _isEnabled = value;
+            OnPropertyChanged();
+        }
+    }
+    public Visibility LoaderVisibility
+    {
+        get => _loaderVisibility;
+        set
+        {
+            _loaderVisibility = value;
+            OnPropertyChanged();
         }
     }
     #endregion
 
     #region relayCommand
-    private RelayCommand _proceedCommand;
-    public RelayCommand ProceedCommand =>
-        _proceedCommand ??= new RelayCommand(async () => await ProceedAsync(), IsFormFilled);
-    #endregion
-    private async Task ProceedAsync()
+    private RelayCommand<object> _proceedCommand;
+    public RelayCommand<object> ProceedCommand =>
+           _proceedCommand ??= new RelayCommand<object>(_ => Proceed(), IsFormFilled);
+    #endregion 
+    private async void Proceed()
     {
-        Thread.Sleep(2000); // to Test UI blocking
-        if (!ValidForm()) return;
-        var _person = new Person(FirstName, LastName, Email, DateOfBirth);
-        _gotoResultView?.Invoke(_person);
+        IsEnabled = false;
+        LoaderVisibility = Visibility.Visible;
+        try
+        {
+            await Task.Run(() =>
+            {
+                Thread.Sleep(3000);
+                if (!ValidForm()) return;
+                Person person = new Person(FirstName, LastName, Email, DateOfBirth);
+                _gotoResultView?.Invoke(person);
+            });
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message);
+        }
+        finally
+        {
+            IsEnabled = true;
+            LoaderVisibility = Visibility.Hidden;
+        }
     }
 
     #region Validation
-    private bool IsFormFilled()
+    private bool IsFormFilled(object obj=null)
     {
         return !(string.IsNullOrWhiteSpace(FirstName) ||
             string.IsNullOrWhiteSpace(LastName) ||
@@ -99,6 +132,7 @@ public class FormViewModel : INotifyPropertyChanged
         {
             age--;
         }
+
         if (DateOfBirth > today)
         {
             MessageBox.Show("BirthDate cant be in future!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
