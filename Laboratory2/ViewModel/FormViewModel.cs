@@ -95,8 +95,10 @@ public class FormViewModel : INotifyPropertyChanged
             await Task.Run(() =>
             {
                 Thread.Sleep(3000);
-                if (!ValidForm()) return;
+                if (!IsFormFilled()) return;
                 Person person = new Person(FirstName, LastName, Email, DateOfBirth);
+                if (person.isPersonNull())
+                    return;
                 _gotoResultView?.Invoke(person);
             });
         }
@@ -117,33 +119,6 @@ public class FormViewModel : INotifyPropertyChanged
         return !(string.IsNullOrWhiteSpace(FirstName) ||
             string.IsNullOrWhiteSpace(LastName) ||
             string.IsNullOrWhiteSpace(Email) || DateOfBirth == DateTime.Today);
-    }
-    private bool ValidForm()
-    {
-        if (!IsFormFilled())
-        {
-            return false;
-        }
-
-        DateTime today = DateTime.Today;
-        int age = DateTime.Today.Year - DateOfBirth.Year;
-
-        if (DateTime.Today < DateOfBirth.AddYears(age))
-        {
-            age--;
-        }
-
-        if (DateOfBirth > today)
-        {
-            MessageBox.Show("BirthDate cant be in future!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            return false;
-        }
-        if (age > 135)
-        {
-            MessageBox.Show("User age cant be more than 135!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            return false;
-        }
-        return true;
     }
     #endregion
 
