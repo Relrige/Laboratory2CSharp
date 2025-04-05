@@ -16,18 +16,12 @@ namespace Laboratory2.View
 
         private void GoToFormView()
         {
-            Dispatcher.Invoke(() =>
-            {
-                Content = new FormView(GoToOutputView);
-            });
+            Content = new FormView(GoToOutputView);
         }
         private void GoToOutputView(Person person)
         {
             _currentPerson = person;
-            Dispatcher.Invoke(() =>
-            {
-                Content = new OutputView(_currentPerson, GoToFormView);
-            });
+            Content = new OutputView(_currentPerson, GoToFormView);
         }
 
     }

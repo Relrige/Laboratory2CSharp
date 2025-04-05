@@ -131,10 +131,6 @@ namespace Laboratory2.Model
             _westernSign = DateHelper.GetWesternZodiac(DateOfBirth);
             _chineseSign = DateHelper.GetChineseZodiac(DateOfBirth);
             _isBirthday = DateTime.Today.Month == DateOfBirth.Month && DateTime.Today.Day == DateOfBirth.Day;
-            if (_isBirthday)
-            {
-                MessageBox.Show($"Happy Birthday, {FirstName}!", "Congratulations", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
         }
 
         public bool isPersonNull()
