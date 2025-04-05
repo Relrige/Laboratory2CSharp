@@ -19,7 +19,7 @@ public class FormViewModel : INotifyPropertyChanged
     private string _firstName;
     private string _lastName;
     private string _email;
-    private DateTime _dateOfBirth = DateTime.Today;
+    private DateTime _dateOfBirth = DateTime.Today.AddDays(1);
 
     private bool _isEnabled = true;
     private Visibility _loaderVisibility = Visibility.Hidden;
@@ -92,13 +92,25 @@ public class FormViewModel : INotifyPropertyChanged
         LoaderVisibility = Visibility.Visible;
         try
         {
-            await Task.Run(() =>
+            Person person = await Task.Run(() =>
             {
                 Thread.Sleep(3000);
-                if (!ValidForm()) return;
-                Person person = new Person(FirstName, LastName, Email, DateOfBirth);
-                _gotoResultView?.Invoke(person);
+                if (!IsFormFilled()) return null;
+
+                var p = new Person(FirstName, LastName, Email, DateOfBirth);
+                if (p.isPersonNull())
+                    return null;
+
+                return p;
             });
+            if (person != null && person.IsBirthday)
+            {
+                MessageBox.Show($"Happy Birthday, {FirstName}!", "Congratulations", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            if (person != null)
+            {
+                _gotoResultView?.Invoke(person);
+            }
         }
         catch (Exception ex)
         {
@@ -116,34 +128,7 @@ public class FormViewModel : INotifyPropertyChanged
     {
         return !(string.IsNullOrWhiteSpace(FirstName) ||
             string.IsNullOrWhiteSpace(LastName) ||
-            string.IsNullOrWhiteSpace(Email) || DateOfBirth == DateTime.Today);
-    }
-    private bool ValidForm()
-    {
-        if (!IsFormFilled())
-        {
-            return false;
-        }
-
-        DateTime today = DateTime.Today;
-        int age = DateTime.Today.Year - DateOfBirth.Year;
-
-        if (DateTime.Today < DateOfBirth.AddYears(age))
-        {
-            age--;
-        }
-
-        if (DateOfBirth > today)
-        {
-            MessageBox.Show("BirthDate cant be in future!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            return false;
-        }
-        if (age > 135)
-        {
-            MessageBox.Show("User age cant be more than 135!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            return false;
-        }
-        return true;
+            string.IsNullOrWhiteSpace(Email) || DateOfBirth == DateTime.Today.AddDays(1));
     }
     #endregion
 
